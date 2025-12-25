@@ -1,0 +1,753 @@
+{% extends "base.html" %}
+{% block head %}
+
+  <title>Kalendarz zadań</title>
+    <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FullCalendar (CSS + JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <style>
+    :root {
+  --sportwin-primary: #6dc000;
+  --sportwin-primary-hover: #509100;
+  --sportwin-bg: #f3f6fb;
+  --sportwin-card-bg: #ffffff;
+  --sportwin-text: #232b3a;
+  --sportwin-muted: #9aa4b2;
+}
+body {
+  background: var(--sportwin-bg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--sportwin-text);
+}
+/* Zadanie spóźnione (niezakończone po czasie) */
+.fc-event-overdue,
+.fc-timegrid-event.fc-event-overdue,
+.fc-daygrid-event.fc-event-overdue {
+  background: #dc2626 !important;   /* czerwony */
+  border-color: #b91c1c !important;
+}
+/* Główne "pudełko" kalendarza */
+.fc {
+  background: var(--sportwin-card-bg);
+  border-radius: 18px;
+
+  padding: 24px 24px 16px;
+  border: none;
+}
+/* Górny toolbar */
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 1.5rem;
+}
+.fc-scrollgrid-section-header .fc-scroller{
+  overflow: visible !important;
+}
+/* Tytuł miesiąca */
+.fc .fc-toolbar-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--sportwin-text);
+}
+
+/* Kontener z przyciskami */
+.fc .fc-toolbar-chunk {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Wszystkie przyciski */
+.fc .fc-button {
+  background: var(--sportwin-primary);
+  border: none;
+  border-radius: 0px;
+  padding: 0.45rem 0.9rem;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Hover / active */
+.fc .fc-button:hover,
+.fc .fc-button:focus {
+  background: var(--sportwin-primary-hover);
+
+}
+
+/* Wybrany zakres (np. Today) */
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background: var(--sportwin-primary-hover);
+  border: none;
+}
+
+/* Wyłączenie niebieskich ramek itd. */
+.fc .fc-button:focus {
+  outline: none;
+}
+/* Usunięcie grubych szarych ramek */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e5e7eb;
+}
+
+/* Header z nazwami dni */
+.fc .fc-col-header-cell {
+  background: transparent;
+  padding: 0.4rem 0;
+  color: var(--sportwin-muted);
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Komórki dni – delikatne tło */
+.fc .fc-daygrid-day {
+  background: #f9fafb;
+}
+
+/* Liczba dnia */
+.fc .fc-daygrid-day-number {
+  color: var(--sportwin-text);
+  font-weight: 600;
+}
+
+/* Dzisiejsza data – zielone, ale pastelowe tło */
+.fc .fc-day-today {
+  background: rgba(122, 216, 0, 0.08);
+}
+
+/* Dzisiejsza liczba dnia */
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: var(--sportwin-primary);
+}
+/* Pojedyncze eventy */
+.fc .fc-daygrid-event {
+  background: var(--sportwin-primary);
+  border-radius: 0;
+  border: none;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Tekst eventu */
+.fc .fc-daygrid-event .fc-event-title {
+  color: #ffffff;
+}
+
+/* Hover na evencie */
+.fc .fc-daygrid-event:hover {
+  background: var(--sportwin-primary-hover);
+}
+.fc .fc-view-harness{
+  height: 580px !important;
+}
+.fc{
+  border-radius: 0 !important;
+}
+/* przycisk X w prawym górnym rogu eventu */
+.fc-event .event-delete-btn {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+.fc-event .event-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.9); /* czerwony na hover */
+}
+.fc-timegrid-event{
+  border-radius: 0;
+}
+
+/* Uchwyt do resize na dole eventu z widocznym "v" */
+.fc-timegrid-event .fc-event-resizer-end {
+  height: 14px;
+  bottom: 0px !important;
+  background: #1d4ed8;          /* ciemny pasek na dole */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  border: 2px solid #1d4ed8;
+}
+.fc-event-complete,
+.fc-timegrid-event.fc-event-complete,
+.fc-daygrid-event.fc-event-complete {
+  background: #16a34a !important;   /* ładna zieleń */
+  border-color: #15803d !important;
+}
+/* Ulepszenia na mobile */
+@media (max-width: 768px) {
+  /* toolbar w jednej kolumnie, żeby się nie ściskał */
+  .fc .fc-toolbar.fc-header-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  /* trochę mniejsze czcionki */
+  .fc .fc-toolbar-title {
+    font-size: 16px;
+  }
+
+  .fc .fc-timegrid-slot-label {
+    font-size: 10px;
+  }
+
+  .fc .fc-timegrid-slot {
+    height: 2rem; /* mniejsze sloty godzinowe */
+  }
+}
+  </style>
+{% endblock %}
+{% block body %}
+
+  <div class="max-w-6xl mx-auto py-8 px-6 lg:px-0">
+    <div id="calendar" class="bg-slate-50 shadow p-4"></div>
+  </div>
+
+  <!-- MODAL Tailwind -->
+  <div id="taskModal"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden">
+    <div class="bg-slate-50 shadow-xl max-w-md w-full mx-4 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-2" id="modalTitle"></h2>
+      <p class="text-sm text-gray-700 mb-4" id="modalDescription"></p>
+
+      <div class="flex justify-end">
+        <button type="button"
+                id="closeModal"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200">
+          Zamknij
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+  id="createTaskModal"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+>
+  <!-- OKNO MODALA -->
+  <div class="bg-white shadow p-6 w-full max-w-md relative">
+    <button
+      type="button"
+      id="createTaskModalClose"
+      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+    >
+      ✕
+    </button>
+
+    <h2 class="text-xl font-semibold mb-4">Dodaj zadanie</h2>
+
+    <form class="py-2 flex flex-col gap-4" id="createTaskForm">
+      <input
+        class="p-2 border border-gray-300"
+        placeholder="Nazwa zadania"
+        type="text"
+        name="content"
+        id="content"
+        required
+      />
+      <textarea
+        class="p-2 border border-gray-300"
+        placeholder="Opis zadania (opcjonalnie)"
+        name="description"
+        id="description"
+        rows="4"
+      ></textarea>
+        <div class="flex flex-col gap-1">
+          <label for="complete" class="text-sm text-gray-700">Status</label>
+          <select
+            id="complete"
+            name="complete"
+            class="p-2 border border-gray-300"
+          >
+            <option value="0">Nierozpoczęte</option>
+            <option value="1">W trakcie</option>
+            <option value="2">Zakończone</option>
+          </select>
+        </div>
+
+      <!-- UKRYTE POLA NA DATY -->
+      <input type="hidden" id="taskStart" name="start" />
+      <input type="hidden" id="taskEnd" name="end" />
+
+      <input
+        class="py-2 px-4 bg-green-600 hover:bg-green-700 text-slate-100 hover:cursor-pointer"
+        type="submit"
+        value="Utwórz zadanie"
+        id="btn_add"
+      />
+    </form>
+  </div>
+</div>
+<!-- MODAL POTWIERDZENIA USUNIĘCIA -->
+<div
+  id="deleteTaskModal"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden"
+>
+  <div class="bg-white shadow p-6 w-full max-w-md relative">
+    <h2 class="text-xl font-semibold mb-4">Usuń zadanie</h2>
+    <p class="mb-4" id="deleteTaskText">
+      Czy na pewno chcesz usunąć to zadanie?
+    </p>
+    <div class="flex justify-end gap-2">
+      <button
+        type="button"
+        id="cancelDeleteTask"
+        class="px-4 py-2 bg-gray-300 hover:bg-gray-400"
+      >
+        Anuluj
+      </button>
+      <button
+        type="button"
+        id="confirmDeleteTask"
+        class="px-4 py-2 bg-red-600 text-white hover:bg-red-700"
+      >
+        Usuń
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    const calendarEl = document.getElementById("calendar");
+    function isMobile() {
+      return window.innerWidth < 768;     // próg możesz zmienić
+    }
+
+    function getInitialView() {
+      // desktop: tydzień z godzinami, mobile: lista dnia
+      return isMobile() ? 'timeGridDay' : 'timeGridWeek';
+    }
+    // ---- MODAL DODAWANIA ----
+    const createTaskModal = document.getElementById("createTaskModal");
+    const createTaskModalClose = document.getElementById("createTaskModalClose");
+    const createTaskForm = document.getElementById("createTaskForm");
+    const inputContent = document.getElementById("content");
+    const inputStatus = document.getElementById("complete");
+    const inputDescription = document.getElementById("description");
+
+    // tu będziemy trzymać start z klikniętego miejsca
+    let selectedStart = null;
+    let selectedEnd = null;
+    let editingEvent = null;
+    let eventToDelete = null;
+
+    function openDeleteTaskModal(event) {
+      eventToDelete = event;
+      deleteTaskText.textContent =
+        `Czy na pewno chcesz usunąć zadanie: "${event.title || 'bez nazwy'}"?`;
+      deleteTaskModal.classList.remove("hidden");
+    }
+
+    function closeDeleteTaskModal() {
+      deleteTaskModal.classList.add("hidden");
+      eventToDelete = null;
+      }
+        cancelDeleteTask.addEventListener("click", closeDeleteTaskModal);
+    deleteTaskModal.addEventListener("click", (e) => {
+      if (e.target === deleteTaskModal) {
+        closeDeleteTaskModal();
+      }
+    });
+    function openCreateTaskModal() {
+      editingEvent = null; // tryb tworzenia
+
+      // zmień nagłówek i tekst przycisku
+      document.querySelector("#createTaskModal h2").textContent = "Dodaj zadanie";
+      document.getElementById("btn_add").value = "Utwórz zadanie";
+
+      inputContent.value = "";
+      inputDescription.value = "";
+      inputStatus.value = "0";
+      createTaskModal.classList.remove("hidden");
+    }
+
+
+    function openEditTaskModal(event) {
+      editingEvent = event; // zapamiętujemy, który event edytujemy
+
+      document.querySelector("#createTaskModal h2").textContent = "Edytuj zadanie";
+      document.getElementById("btn_add").value = "Zapisz zmiany";
+
+      // wczytanie danych – content może być w extendedProps, a jak nie ma, to użyj title
+      const contentVal = event.extendedProps.content || event.title || "";
+      const descVal = event.extendedProps.description || "";
+      const statusVal = event.extendedProps.complete ?? 0;
+
+      inputContent.value = contentVal;
+      inputDescription.value = descVal;
+      inputStatus.value = String(statusVal);
+
+      // ustaw zakres, żeby submit miał start/end
+      selectedStart = event.startStr;
+      selectedEnd = event.endStr;
+
+      createTaskModal.classList.remove("hidden");
+    }
+
+    function closeCreateTaskModal() {
+      createTaskModal.classList.add("hidden");
+    }
+
+    createTaskModalClose.addEventListener("click", closeCreateTaskModal);
+    createTaskModal.addEventListener("click", (e) => {
+      if (e.target === createTaskModal) {
+        closeCreateTaskModal();
+      }
+    });
+    // ---- OVERDUE / CZERWONE ZADANIA ----
+
+// Zwraca true, jeśli event jest po czasie i nie ma complete = 2 (zakończone).
+function isEventOverdue(event) {
+  // complete: 0 = nierozpoczęte, 1 = w trakcie, 2 = zakończone
+  const complete =
+    (event.extendedProps && event.extendedProps.complete) ??
+    event.complete ??
+    0;
+
+  // zakończone → nigdy nie spóźnione
+  if (complete === 2) return false;
+
+  const now = new Date();
+  const end = event.end || event.start;
+  if (!end) return false;
+
+  return end < now;
+}
+
+// Ustawia kolor eventu w zależności od complete + czasu
+// 0 = nierozpoczęte, 1 = w trakcie, 2 = zakończone
+function updateEventOverdueStyling(event) {
+  if (!event) return;
+
+  const complete =
+    (event.extendedProps && event.extendedProps.complete) ??
+    event.complete ??
+    0;
+
+  const now = new Date();
+  const end = event.end || event.start;
+  const isOverdue = complete !== 2 && end && end < now;
+
+  // usuń stare klasy statusu
+  let classes = event.classNames ? [...event.classNames] : [];
+  classes = classes.filter(
+    c => c !== "fc-event-overdue" && c !== "fc-event-complete"
+  );
+
+  // dodaj odpowiednią klasę
+  if (isOverdue) {
+    classes.push("fc-event-overdue");      // czerwony
+  } else if (complete === 2) {
+    classes.push("fc-event-complete");     // zielony
+  }
+
+  event.setProp("classNames", classes);
+}
+    // ---- INICJALIZACJA KALENDARZA ----
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: getInitialView(),
+      locale: 'pl',
+      firstDay: 1,
+
+      allDaySlot: false,
+
+      slotMinTime: '06:00:00',
+      slotMaxTime: '22:00:00',
+      slotDuration: '00:15:00',
+
+      nowIndicator: true, 
+
+      slotLabelInterval: '01:00',
+      slotLabelFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      },
+      
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: isMobile()
+          ? 'timeGridDay,listWeek'                // na telefonie tylko listy
+          : 'dayGridMonth,timeGridWeek,timeGridDay' // na desktopie więcej
+      },
+      buttonText: {
+        today: 'Dziś',
+        month: 'Miesiąc',
+        week: 'Tydzień',
+        day: 'Dzień'
+      },
+
+      editable: true,
+      eventDurationEditable: true,
+      events: "/api/tasks/all",
+        /* 🔥 to dodaj */
+      selectable: true,        // pozwala zaznaczać zakres myszką
+      selectMirror: true,      // podgląd zaznaczenia
+      unselectAuto: true,
+      // 🔹 klik w puste miejsce → zapamiętaj start i pokaż modal
+      dateClick: function(info) {
+        selectedStart = info.dateStr;   // np. "2025-12-06T10:30:00+01:00"
+        selectedEnd = null;
+        openCreateTaskModal();
+      },
+       eventDidMount: function(info) {
+        if (info.view.type.indexOf('list') === 0) {
+          info.el.style.position = 'relative';
+        }
+        const btn = document.createElement("button");
+        btn.className = "event-delete-btn";
+        btn.innerHTML = "&times;";
+
+        // kliknięcie w X nie powinno wywołać eventClick
+        btn.addEventListener("click", function(e) {
+          e.stopPropagation();
+          openDeleteTaskModal(info.event);
+        });
+        info.el.appendChild(btn);
+        updateEventOverdueStyling(info.event);
+      },
+      // 🔹 klik w event -> modal podglądu (jak miałeś)
+      eventClick: function(info) {
+        // ALT + CLICK → DUPLIKACJA (zostaje tak jak było)
+        if (info.jsEvent.altKey) {
+          info.jsEvent.preventDefault();
+          info.jsEvent.stopPropagation();
+
+          fetch(`/api/tasks/${info.event.id}/duplicate`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+          })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(t => { throw new Error(t || "Błąd HTTP"); });
+            }
+            return res.json();
+          })
+          .then(data => {
+            calendar.addEvent({
+              id: data.id,
+              title: data.title,
+              start: data.start,
+              end: data.end,
+              complete: data.complete,
+              extendedProps: {
+                description: data.description,
+                content: data.content,
+
+              }
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Nie udało się zduplikować zadania");
+          });
+
+          return;
+        }
+
+        // ZWYKŁY CLICK → EDYCJA
+        openEditTaskModal(info.event);
+      },
+
+
+      eventDrop: function (info) {
+        const event = info.event;
+
+        fetch(`/api/tasks/${event.id}/move`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start: event.startStr,
+            end: event.endStr
+          })
+        }).then(response => {
+          if (!response.ok) {
+            alert("Błąd przy zapisie daty zadania");
+            info.revert();
+          }
+          else{
+              updateEventOverdueStyling(event);
+          }
+        }).catch(err => {
+          console.error(err);
+          alert("Błąd sieci");
+          info.revert();
+        });
+      },
+
+      eventResize: function (info) {
+        const event = info.event;
+
+        fetch(`/api/tasks/${event.id}/resize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start: event.startStr,
+            end: event.endStr
+          })
+        }).then(res => {
+          if (!res.ok) {
+            alert("Błąd przy zmianie długości zadania");
+            info.revert();
+          } else{
+              updateEventOverdueStyling(event);
+          }
+        }).catch(err => {
+          console.error(err);
+          alert("Błąd sieci");
+          info.revert();
+        });
+      },
+        select: function(info) {
+          // info.start / info.end to obiekty Date
+          // info.startStr / info.endStr to ISO stringi (takie jak w eventach)
+          selectedStart = info.startStr;
+          selectedEnd = info.endStr;
+
+          openCreateTaskModal();}
+    });
+    
+    calendar.render();
+    window.addEventListener('resize', function () {
+    const newView = getInitialView();  // używa isMobile()
+      if (calendar.view.type !== newView) {
+        calendar.changeView(newView);
+      }
+    });
+    function refreshOverdueEvents() {
+      const events = calendar.getEvents();
+      events.forEach(updateEventOverdueStyling);
+    }
+
+    // od razu po starcie
+    refreshOverdueEvents();
+
+    // a potem co 60 sekund
+    setInterval(refreshOverdueEvents, 60000);
+    confirmDeleteTask.addEventListener("click", function() {
+    if (!eventToDelete) return;
+
+    const id = eventToDelete.id;
+
+    fetch(`/api/tasks/${id}/delete`, {
+      method: "POST",              // albo DELETE, jak wolisz
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(t => { throw new Error(t || "Błąd HTTP"); });
+      }
+      // usuwamy z kalendarza
+      eventToDelete.remove();
+      closeDeleteTaskModal();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Nie udało się usunąć zadania");
+    });
+  });
+    // 🔹 submit modala – wysyłamy content, description i start z kliknięcia
+  createTaskForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const content = inputContent.value.trim();
+  const description = inputDescription.value.trim();
+  const complete = parseInt(inputStatus.value, 10); // 0 / 1 / 2
+
+  if (!content) {
+    alert("Podaj nazwę zadania");
+    return;
+  }
+  if (!selectedStart) {
+    alert("Najpierw kliknij w kalendarz, żeby wybrać godzinę");
+    return;
+  }
+
+  const isEdit = !!editingEvent;
+  const url = isEdit
+    ? `/api/tasks/${editingEvent.id}/edit`
+    : `/api/tasks/create`;
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      content: content,
+      description: description,
+      start: selectedStart,
+      end: selectedEnd,
+      complete: complete   // 👈 to wysyłamy
+    })
+  })
+  .then(res => {
+    if (!res.ok) {
+      return res.text().then(t => { throw new Error(t || "Błąd HTTP"); });
+    }
+    return res.json();
+  })
+  .then(data => {
+    // DLA PEWNOŚCI: zobacz co backend zwraca
+    // console.log("TASK RESPONSE", data);
+
+    if (isEdit) {
+      // aktualizacja istniejącego eventu
+      editingEvent.setProp("title", data.title || content);
+      editingEvent.setExtendedProp("description", data.description ?? description);
+      editingEvent.setExtendedProp("content", data.content ?? content);
+      editingEvent.setExtendedProp("complete", data.complete ?? complete); // 👈 TU complete
+
+      const newStart = data.start || selectedStart;
+      const newEnd = data.end || selectedEnd;
+      editingEvent.setDates(newStart, newEnd);
+
+      updateEventOverdueStyling(editingEvent); // do czerwonego koloru, patrz niżej
+    } else {
+      // nowy event
+      const newEvent = calendar.addEvent({
+        id: data.id,
+        title: data.title,
+        start: data.start,
+        end: data.end,
+        extendedProps: {
+          description: data.description,
+          content: data.content,
+          complete: data.complete ?? complete   // 👈 TU też complete w extendedProps
+        }
+      });
+
+      updateEventOverdueStyling(newEvent);
+    }
+
+    closeCreateTaskModal();
+    editingEvent = null;
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Błąd sieci / zapisu zadania");
+  });
+});
+  });
+</script>
+{% endblock %}

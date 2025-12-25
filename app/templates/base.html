@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-slate-200">
+    {% block navbar %}
+        <nav class="h-[70px] relative w-full items-center z-20 bg-slate-50 text-slate-700 shadow transition-all">
+            <div class="h-full max-w-6xl flex items-center justify-between mx-auto px-6 lg:px-0">
+                <a href="/calendar" class="font-bold text-xl">
+                    <span class="text-lime-500 ">Sportwin</span>Group
+                </a>
+
+                <ul class="lg:flex hidden items-center gap-10">
+                    <li><a class="hover:text-slate-500/80 transition" href="/calendar">Kalendarz</a></li>
+                    <li><a class="hover:text-slate-500/80 transition" href="#">Pracownicy</a></li>
+                    <li><a class="hover:text-slate-500/80 transition" href="#">Struktura</a></li>
+                    <li><a class="hover:text-slate-500/80 transition" href="#">Wiadomości</a></li>
+                    <li><a class="hover:text-slate-500/80 transition" href="#">Infolinia</a></li>
+                    <li><a class="hover:text-slate-500/80 transition" href="#">CRM</a></li>
+                </ul>
+
+                <div class="gap-6 lg:flex flex-row align-middle items-center hidden">
+                    <a class="hover:text-slate-500/80 transition" href="/">{{ current_user.name }} {{ current_user.surname }}</a>
+                    <a href="/logout" type="button" class="text-red-500 border-gray-300 hover:cursor-pointer hover:text-red-700 transition active:scale-95 transition-all">
+                        Wyloguj się
+                    </a>
+                    
+                </div>
+
+
+                <button aria-label="menu-btn" type="button" class="menu-btn inline-block lg:hidden active:scale-90 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="#000">
+                        <path d="M 3 7 A 1.0001 1.0001 0 1 0 3 9 L 27 9 A 1.0001 1.0001 0 1 0 27 7 L 3 7 z M 3 14 A 1.0001 1.0001 0 1 0 3 16 L 27 16 A 1.0001 1.0001 0 1 0 27 14 L 3 14 z M 3 21 A 1.0001 1.0001 0 1 0 3 23 L 27 23 A 1.0001 1.0001 0 1 0 27 21 L 3 21 z"></path>
+                    </svg>
+                </button>
+
+                <div class="mobile-menu absolute top-[70px] left-0 w-full bg-white p-6 hidden md:hidden">
+                    <ul class="flex flex-col space-y-4 text-lg">
+                        <li><a href="#" class="text-sm">Home</a></li>
+                        <li><a href="#" class="text-sm">Services</a></li>
+                        <li><a href="#" class="text-sm">Portfolio</a></li>
+                        <li><a href="#" class="text-sm">Pricing</a></li>
+                    </ul>
+
+                    <button type="button" class="bg-white text-gray-600 border border-gray-300 mt-6 text-sm hover:bg-gray-50 active:scale-95 transition-all w-40 h-11 rounded-full">
+                        Get started
+                    </button>
+                </div>
+            </div>        
+            
+        </nav>
+
+        <script>
+            const menuButtons = document.querySelectorAll('.menu-btn');
+            const mobileMenus = document.querySelectorAll('.mobile-menu');
+
+            menuButtons.forEach((btn, index) => {
+                btn.addEventListener('click', () => {
+                    mobileMenus[index].classList.toggle('hidden');
+                });
+            });
+
+        </script>
+    {% endblock %}
+    {% block body %}{% endblock %}
+    {% block footer %}
+        <footer class="px-6 py-4 shadow bg-slate-50">
+            <aside>
+                <p class="text-center text-slate-600">Copyright © 2025 Dawid Ciesielski - All right reserved.</p>
+            </aside>
+        </footer>
+    {% endblock %}
+</body>
+</html>

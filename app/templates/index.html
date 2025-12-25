@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block head %}
+
+    <title>Panel PR9</title>
+{% endblock %}
+{% block body %}
+    {% block navbar %}{% endblock %}
+    <div class="container max-w-6xl mx-auto mt-32 ">
+        <div class="mx-auto w-fit">
+            <h1 class="text-3xl font-medium text-center text-gray-600 mb-8">Witamy w <span class="text-lime-500">Sportwin</span></h1>
+            <form id="auth" action="{{ url_for('auth.home') }}" method="POST" class="bg-slate-100 rounded-lg shadow text-sm text-gray-600 border border-gray-200 p-8 py-12 w-80 sm:w-[352px]">
+                <p class="text-2xl font-medium text-center">
+                    <span class="text-lime-500">Panel</span> Logowania
+                </p>
+
+                <div class="mt-4">
+                    <label class="block">Login</label>
+                    <input type="username" name="username" placeholder="johndoe123" required
+                        class="border border-gray-200 rounded w-full p-2 mt-1 outline-lime-500">
+                </div>
+
+                <div class="mt-4">
+                    <label class="block">Hasło</label>
+                    <input type="password" name="password" placeholder="*******" required
+                        class="border border-gray-200 rounded w-full p-2 mt-1 outline-lime-500">
+                </div>
+
+                <button type="submit" class="bg-lime-500 hover:bg-lime-600 transition-all text-white w-full py-2 rounded-md mt-8 cursor-pointer">
+                    Zaloguj się
+                </button>
+            </form>
+        </div>
+
+    </div>
+    {% block footer %}{% endblock %}
+{% endblock %}
