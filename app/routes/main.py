@@ -10,7 +10,12 @@ def dashboard():
     tasks = MyTask.query.filter_by(user_id=current_user.id).all()
     return render_template("dashboard.html", task=tasks, user=current_user)
 
-@main_bp.route("/calendar")
+@main_bp.route("/kalendarz")
 @login_required
 def calendar_view():
     return render_template("calendar.html")
+
+@main_bp.route("/profile")
+@login_required
+def profile():
+    return render_template("profile.html", user=current_user)

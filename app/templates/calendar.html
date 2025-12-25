@@ -116,14 +116,20 @@ body {
 .fc .fc-day-today {
   background: rgba(122, 216, 0, 0.08);
 }
-
+.fc-event-time{
+  color: #ffffff;
+}
+.fc-daygrid-event-dot
+{
+  border: calc(var(--fc-daygrid-event-dot-width) / 2) solid #ffffff;
+}
 /* Dzisiejsza liczba dnia */
 .fc .fc-day-today .fc-daygrid-day-number {
   color: var(--sportwin-primary);
 }
 /* Pojedyncze eventy */
 .fc .fc-daygrid-event {
-  background: var(--sportwin-primary);
+  background: var(--fc-event-bg-color);
   border-radius: 0;
   border: none;
   padding: 0.1rem 0.4rem;
@@ -136,10 +142,6 @@ body {
   color: #ffffff;
 }
 
-/* Hover na evencie */
-.fc .fc-daygrid-event:hover {
-  background: var(--sportwin-primary-hover);
-}
 .fc .fc-view-harness{
   height: 580px !important;
 }
