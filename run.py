@@ -19,6 +19,10 @@ if __name__ == "__main__":
                 email="dawidciesielski21@gmail.com",
                 name="Dawid",
                 surname="Ciesielski",
+                phone="123456789",
+                position="CEO",
+                department="Sportwin",
+
             )
             admin.set_passwd(admin_password)
             db.session.add(admin)

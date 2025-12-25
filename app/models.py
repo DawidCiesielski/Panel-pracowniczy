@@ -21,6 +21,9 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(25), default="User", nullable=False)
     name = db.Column(db.String(20), nullable=True)
     surname = db.Column(db.String(20), nullable=True)
+    department = db.Column(db.String(100), nullable=True)
+    phone = db.Column(db.String(15), nullable=True)
+    position = db.Column(db.String(50), nullable=True)
     password_hash = db.Column(db.String(255), nullable=False)
 
     def set_passwd(self, password):
