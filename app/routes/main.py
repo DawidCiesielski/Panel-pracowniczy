@@ -9,12 +9,6 @@ main_bp = Blueprint('main', __name__)
 def index():
     return redirect(url_for('auth.login'))
 
-@main_bp.route("/dashboard")
-@login_required
-def dashboard():
-    tasks = MyTask.query.filter_by(user_id=current_user.id).all()
-    return render_template("dashboard.html", task=tasks, user=current_user)
-
 @main_bp.route("/kalendarz")
 @login_required
 def calendar_view():
