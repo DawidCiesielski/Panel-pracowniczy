@@ -16,11 +16,11 @@ def create_app():
 
     from .routes.auth import auth_bp
     from .routes.main import main_bp
-    from .routes.api import api_bp
+    from .routes.tasks_api import tasks_api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp) 
-    app.register_blueprint(api_bp)
+    app.register_blueprint(tasks_api_bp)
 
     return app
 

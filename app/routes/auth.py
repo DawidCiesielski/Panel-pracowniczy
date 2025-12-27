@@ -5,20 +5,21 @@ from ..models import User, db
 # Definiujemy Blueprint
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route("/", methods=["GET", "POST"])
-def home():
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
     if current_user.is_authenticated:
         return redirect(url_for("main.calendar_view"))
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username")
+        password = request.form.get("password")
+        
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_passwd(password):
             login_user(user)
-            flash("Zalogowano pomyślnie", "success")
-            return redirect(url_for("main.calendar_view")) 
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for("main.calendar_view")) 
         
         flash("Zły login lub hasło", "error")
     return render_template("index.html")
@@ -28,4 +29,4 @@ def home():
 def logout():
     logout_user()
     flash("Zostałeś wylogowany", "success")
-    return redirect(url_for("auth.home"))
+    return redirect(url_for("auth.login"))

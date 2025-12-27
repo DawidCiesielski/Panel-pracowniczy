@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
 class MyTask(db.Model):
     __tablename__ = "tasks"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # Relacja!
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.String(100), nullable=False)
     complete = db.Column(db.Integer, default=0)
     description = db.Column(db.String(999), nullable=True)

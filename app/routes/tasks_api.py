@@ -4,9 +4,9 @@ from ..models import MyTask, db
 from dateutil import parser
 from datetime import timedelta
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+tasks_api_bp = Blueprint('tasks_api', __name__, url_prefix='/api/tasks')
 
-@api_bp.route("/tasks/all", methods=["GET"])
+@tasks_api_bp.route("/all", methods=["GET"])
 @login_required
 def get_all_tasks():
     tasks = MyTask.query.filter_by(user_id=current_user.id).all()
@@ -20,7 +20,7 @@ def get_all_tasks():
         "content": task.content
     } for task in tasks])
 
-@api_bp.route("/tasks/<int:task_id>/edit", methods=["POST"])
+@tasks_api_bp.route("/<int:task_id>/edit", methods=["POST"])
 @login_required
 def edit_task(task_id):
     data = request.get_json()
@@ -45,13 +45,15 @@ def edit_task(task_id):
             "title": task.content,
             "start": task.created.isoformat(),
             "end": task.end.isoformat() if task.end else None,
-            "complete": task.complete
+            "complete": task.complete,
+            "description": task.description,
+            "content": task.content
         })
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
-    
-@api_bp.route("/tasks/<int:task_id>/delete", methods=["POST"])
+
+@tasks_api_bp.route("/<int:task_id>/delete", methods=["POST"])
 @login_required
 def delete_task(task_id):
     # Znajdź zadanie lub zwróć 404
@@ -69,7 +71,7 @@ def delete_task(task_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
     
-@api_bp.route("/tasks/<int:task_id>/move", methods=["POST"])
+@tasks_api_bp.route("/<int:task_id>/move", methods=["POST"])
 @login_required
 def move_task(task_id):
     data = request.get_json()
@@ -95,7 +97,7 @@ def move_task(task_id):
         db.session.rollback() # Always rollback on error
         return jsonify({"error": str(e)}), 400
 
-@api_bp.route("/tasks/<int:task_id>/resize", methods=["POST"])
+@tasks_api_bp.route("/<int:task_id>/resize", methods=["POST"])
 @login_required
 def resize_task(task_id):
     data = request.get_json()
@@ -119,7 +121,7 @@ def resize_task(task_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
 
-@api_bp.route("/tasks/create", methods=["POST"])
+@tasks_api_bp.route("/create", methods=["POST"])
 @login_required
 def create_task():
     data = request.get_json()
@@ -165,7 +167,7 @@ def create_task():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-@api_bp.route("/tasks/<int:task_id>/duplicate", methods=["POST"])
+@tasks_api_bp.route("/<int:task_id>/duplicate", methods=["POST"])
 @login_required
 def duplicate_task(task_id):
     task = MyTask.query.get_or_404(task_id)

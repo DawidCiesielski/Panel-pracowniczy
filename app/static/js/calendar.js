@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // wczytanie danych – content może być w extendedProps, a jak nie ma, to użyj title
       const contentVal = event.extendedProps.content || event.title || "";
-      const descVal = event.extendedProps.description || "";
+      const descVal = event.extendedProps.description || event.description || "";
       const statusVal = event.extendedProps.complete ?? 0;
 
       inputContent.value = contentVal;
@@ -230,7 +230,6 @@ function updateEventOverdueStyling(event) {
               extendedProps: {
                 description: data.description,
                 content: data.content,
-
               }
             });
           })
@@ -318,9 +317,6 @@ function updateEventOverdueStyling(event) {
 
     // od razu po starcie
     refreshOverdueEvents();
-
-    // a potem co 60 sekund
-    setInterval(refreshOverdueEvents, 60000);
     confirmDeleteTask.addEventListener("click", function() {
     if (!eventToDelete) return;
 
@@ -337,6 +333,7 @@ function updateEventOverdueStyling(event) {
       }
       // usuwamy z kalendarza
       eventToDelete.remove();
+      refreshOverdueEvents();
       closeDeleteTaskModal();
     })
     .catch(err => {
@@ -383,41 +380,49 @@ function updateEventOverdueStyling(event) {
     if (!res.ok) {
       return res.text().then(t => { throw new Error(t || "Błąd HTTP"); });
     }
+    refreshOverdueEvents();
     return res.json();
   })
   .then(data => {
     // DLA PEWNOŚCI: zobacz co backend zwraca
     // console.log("TASK RESPONSE", data);
 
-    if (isEdit) {
-      // aktualizacja istniejącego eventu
-      editingEvent.setProp("title", data.title || content);
-      editingEvent.setExtendedProp("description", data.description ?? description);
-      editingEvent.setExtendedProp("content", data.content ?? content);
-      editingEvent.setExtendedProp("complete", data.complete ?? complete); // 👈 TU complete
+if (isEdit) {
+      // EDYCJA
+      editingEvent.setProp("title", data.title || content); // Użyj content z inputa, jeśli data.title jest puste
+      
+      // Tutaj kluczowe poprawki (fallbacks):
+      editingEvent.setExtendedProp("description", data.description || description);
+      editingEvent.setExtendedProp("content", data.content || content);
+      editingEvent.setExtendedProp("complete", data.complete ?? complete);
 
       const newStart = data.start || selectedStart;
       const newEnd = data.end || selectedEnd;
       editingEvent.setDates(newStart, newEnd);
-
-      updateEventOverdueStyling(editingEvent); // do czerwonego koloru, patrz niżej
+      
+      updateEventOverdueStyling(editingEvent);
     } else {
-      // nowy event
+      // TWORZENIE NOWEGO
       const newEvent = calendar.addEvent({
-        id: data.id,
-        title: data.title,
-        start: data.start,
-        end: data.end,
+        id: data.id, // ID musi przyjść z bazy, tu nie ma fallbacka
+        title: data.title || content, // Jeśli backend nie zwróci title, weź content z formularza
+        start: data.start || selectedStart,
+        end: data.end || selectedEnd,
+        // WAŻNE: Dodaj classNames od razu tutaj, żeby kolor wskoczył bez czekania na funkcje pomocnicze
+        classNames: complete === 2 ? ['fc-event-complete'] : [], 
         extendedProps: {
-          description: data.description,
-          content: data.content,
-          complete: data.complete ?? complete   // 👈 TU też complete w extendedProps
+          // Tu jest Twój problem - jeśli backend nie zwróci description, wstawiamy to z formularza:
+          description: data.description || description, 
+          content: data.content || content,
+          complete: data.complete ?? complete
         }
       });
-
+      
+      // Odpal stylizację (czerwony kolor) ręcznie dla nowego obiektu
       updateEventOverdueStyling(newEvent);
     }
 
+    refreshOverdueEvents();
     closeCreateTaskModal();
     editingEvent = null;
   })
