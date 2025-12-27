@@ -1,0 +1,34 @@
+# --- Wirtualne środowisko (To jest wielkie, nie wrzucaj tego!) ---
+.venv/
+venv/
+env/
+
+# --- Python Cache (pliki skompilowane) ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Zmienne środowiskowe i sekrety (KRYTYCZNE DLA BEZPIECZEŃSTWA) ---
+# Tutaj trzymasz SECRET_KEY i hasła - nigdy tego nie commituj!
+.env
+.flaskenv
+
+# --- Baza danych (SQLite) ---
+# Nie chcemy nadpisywać bazy danych kolegów ani wrzucać danych testowych
+*.db
+*.sqlite3
+*.sqlite
+
+# Folder instance w Flasku często trzyma DB
+instance/
+
+# --- Logi ---
+*.log
+
+# --- Ustawienia edytora (VS Code, PyCharm) ---
+.vscode/
+.idea/
+
+# --- Systemowe (Mac/Windows) ---
+.DS_Store
+Thumbs.db

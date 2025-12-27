@@ -283,7 +283,7 @@ body {
       <!-- UKRYTE POLA NA DATY -->
       <input type="hidden" id="taskStart" name="start" />
       <input type="hidden" id="taskEnd" name="end" />
-
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input
         class="py-2 px-4 bg-green-600 hover:bg-green-700 text-slate-100 hover:cursor-pointer"
         type="submit"
